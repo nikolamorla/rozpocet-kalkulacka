@@ -10,46 +10,47 @@
     body {
       font-family: 'Inter', sans-serif;
       max-width: 700px;
-      margin: 2rem auto;
+      margin: 1rem auto;
       padding: 1rem;
-      line-height: 1.6;
+      line-height: 1.4;
       background-color: #f9f5f1;
       color: #333;
     }
     h1 {
       font-family: 'Playfair Display', serif;
-      font-size: 2rem;
+      font-size: 1.8rem;
       text-align: center;
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
       color: #4b2e2e;
     }
     p {
       text-align: center;
+      margin: 0.5rem 0 1.2rem;
     }
     fieldset {
       border: none;
-      padding: 1rem 0;
+      padding: 0.5rem 0;
       border-top: 1px solid #ccc;
-      margin-top: 2rem;
+      margin-top: 1.5rem;
     }
     legend {
       font-weight: bold;
-      margin-bottom: 1rem;
-      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
     }
     label {
       display: block;
-      margin-top: 1rem;
+      margin-top: 0.5rem;
       font-weight: 500;
     }
     input[type="number"], select {
       width: 100%;
-      padding: 0.5rem;
+      padding: 0.4rem;
       margin-top: 0.2rem;
       border: 1px solid #ccc;
-      border-radius: 8px;
-      box-sizing: border-box;
+      border-radius: 6px;
       background-color: #fff;
+      font-size: 0.95rem;
     }
     .tooltip {
       display: inline-block;
@@ -69,18 +70,19 @@
       padding: 6px 10px;
       border-radius: 6px;
       white-space: nowrap;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       z-index: 10;
     }
     button {
-      margin-top: 2rem;
-      padding: 0.8rem 1.5rem;
+      margin: 1.5rem auto 1rem;
+      display: block;
+      padding: 0.6rem 1.2rem;
       font-size: 1rem;
       font-weight: 600;
       background-color: #e1c6ac;
       color: #4b2e2e;
       border: none;
-      border-radius: 12px;
+      border-radius: 10px;
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
@@ -88,16 +90,16 @@
       background-color: #d1b59b;
     }
     .results {
-      margin-top: 2rem;
-      padding: 1.5rem;
+      margin-top: 1.5rem;
+      padding: 1rem;
       background-color: #fff;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     }
     .results h2 {
       font-family: 'Playfair Display', serif;
       color: #4b2e2e;
-      margin-bottom: 1rem;
+      margin-bottom: 0.8rem;
     }
     ul {
       padding-left: 1.2rem;
@@ -113,12 +115,8 @@
     }
     canvas {
       max-width: 100%;
-      margin-top: 1.5rem;
-    }
-    @media screen and (max-width: 600px) {
-      body {
-        padding: 1rem;
-      }
+      margin: 1rem auto 0;
+      display: block;
     }
   </style>
 </head>
@@ -144,6 +142,10 @@
       <label>Zábava: <input type="number" id="entertainment" value="0"></label>
       <label>Splátky / dluhy: <input type="number" id="debts" value="0"></label>
       <label>Ostatní: <input type="number" id="other" value="0"></label>
+      <label>Spoření <span class="tooltip" data-tooltip="Bezpečné odkládání peněz – např. spořicí účet, hotovost">❓</span>
+        <input type="number" id="currentSaving" value="0"></label>
+      <label>Investice <span class="tooltip" data-tooltip="Zhodnocování peněz s výkyvy – např. ETF, akcie, kryptoměny">❓</span>
+        <input type="number" id="currentInvesting" value="0"></label>
     </fieldset>
 
     <label>Styl rozpočtování:
@@ -153,19 +155,6 @@
         <option value="balanced">Vyvážený</option>
       </select>
     </label>
-
-    <label>
-      <input type="checkbox" id="alreadySaving"> Už pravidelně spořím/investuju
-    </label>
-
-    <div id="current-saving-section" class="hidden">
-      <label>Spořím <span class="tooltip" data-tooltip="Bezpečné odkládání peněz – např. spořicí účet, hotovost">❓</span>
-        <input type="number" id="currentSaving" value="0">
-      </label>
-      <label>Investuju <span class="tooltip" data-tooltip="Zhodnocování peněz s výkyvy – např. ETF, akcie, kryptoměny">❓</span>
-        <input type="number" id="currentInvesting" value="0">
-      </label>
-    </div>
 
     <button type="submit">Spočítat</button>
   </form>
@@ -179,15 +168,11 @@
     const ctx = document.getElementById('budgetChart').getContext('2d');
     let chart;
 
-    document.getElementById("alreadySaving").addEventListener("change", function () {
-      document.getElementById("current-saving-section").classList.toggle("hidden", !this.checked);
-    });
-
     document.getElementById("budget-form").addEventListener("submit", function (e) {
       e.preventDefault();
 
       const income = Number(document.getElementById("mainIncome").value) + Number(document.getElementById("sideIncome").value);
-      const expenses = ["housing", "food", "transport", "utilities", "children", "pets", "entertainment", "debts", "other"]
+      const expenses = ["housing", "food", "transport", "utilities", "children", "pets", "entertainment", "debts", "other", "currentSaving", "currentInvesting"]
         .map(id => Number(document.getElementById(id).value) || 0)
         .reduce((a, b) => a + b, 0);
 
@@ -221,28 +206,15 @@
       let resultHtml = `
         <h2>Výsledky</h2>
         <p><strong>Zůstatek po výdajích:</strong> ${balance.toFixed(2)} Kč</p>
-        <p><strong>Doporučené rozdělení:</strong></p>
+        <p><strong>Doporučené rozdělení zůstatku:</strong></p>
         <ul>
           <li>Investice: ${invest.toFixed(2)} Kč</li>
           <li>Spoření (rezerva): ${save.toFixed(2)} Kč</li>
           <li>Volné výdaje: ${free.toFixed(2)} Kč</li>
         </ul>
+        <p><em>${message}</em></p>
       `;
 
-      if (document.getElementById("alreadySaving").checked) {
-        const currentSaving = Number(document.getElementById("currentSaving").value) || 0;
-        const currentInvesting = Number(document.getElementById("currentInvesting").value) || 0;
-
-        const saveDiff = save - currentSaving;
-        const investDiff = invest - currentInvesting;
-
-        resultHtml += `<p><strong>Srovnání s tvým aktuálním nastavením:</strong></p><ul>`;
-        resultHtml += `<li>Spoříš: ${currentSaving} Kč → ${saveDiff <= 0 ? 'splněno ✅' : 'doporučeno navýšit o ' + saveDiff.toFixed(2) + ' Kč'}</li>`;
-        resultHtml += `<li>Investuješ: ${currentInvesting} Kč → ${investDiff <= 0 ? 'splněno ✅' : 'doporučeno navýšit o ' + investDiff.toFixed(2) + ' Kč'}</li>`;
-        resultHtml += `</ul>`;
-      }
-
-      resultHtml += `<p><em>${message}</em></p>`;
       document.getElementById("results").innerHTML = resultHtml;
 
       // vykreslení koláčového grafu
