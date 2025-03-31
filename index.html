@@ -1,269 +1,149 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rozpočtová kalkulačka</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kalkulačka složeného úročení</title>
+  <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <audio id="meowSound" src="cat-meow-8-fx-306184.mp3" preload="auto"></audio>
   <style>
     body {
-      font-family: 'Inter', sans-serif;
-      max-width: 440px;
-      margin: 1rem auto;
-      padding: 0.5rem;
-      line-height: 1.4;
-      background-color: #f9f5f1;
+      font-family: 'League Spartan', sans-serif;
+      background-color: #fff;
       color: #333;
+      margin: 0;
+      padding: 2rem 1rem;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
     }
     h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.8rem;
-      text-align: center;
+      color: #f5a623;
+      font-size: 2rem;
       margin-bottom: 0.5rem;
-      color: #4b2e2e;
-    }
-    p {
       text-align: center;
-      margin: 0.5rem 0 1.2rem;
     }
-    fieldset {
-      border: none;
-      padding: 0.5rem 0;
-      border-top: 1px solid #ccc;
-      margin-top: 1.5rem;
-    }
-    legend {
-      font-weight: bold;
-      margin-bottom: 0.5rem;
-      font-size: 1rem;
+    p.subtitle {
+      color: #ffaeb8;
+      margin-bottom: 2rem;
+      font-style: italic;
+      text-align: center;
     }
     label {
       display: block;
-      margin-top: 0.3rem;
-      font-weight: 500;
-    }
-    input[type="number"], select {
-      width: 100%;
-      padding: 0.4rem;
-      margin-top: 0.2rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      background-color: #fff;
-      font-size: 0.95rem;
+      margin: 1rem 0 0.5rem;
+      font-size: 1rem;
     }
     .tooltip {
       display: inline-block;
       position: relative;
-      cursor: pointer;
-      margin-left: 5px;
-      color: #666;
+      cursor: help;
+      font-size: 2rem;
+      line-height: 2rem;
     }
-    .tooltip:hover::after {
-      content: attr(data-tooltip);
+    .tooltip .tooltip-text {
+      visibility: hidden;
+      width: 240px;
+      background-color: #f5a623;
+      color: white;
+      text-align: center;
+      border-radius: 0.5rem;
+      padding: 0.75rem;
       position: absolute;
+      z-index: 1;
       bottom: 125%;
       left: 50%;
-      transform: translateX(-50%);
-      background-color: #333;
-      color: #fff;
-      padding: 6px 10px;
-      border-radius: 6px;
-      white-space: nowrap;
-      font-size: 0.8rem;
-      z-index: 10;
+      margin-left: -120px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 0.9rem;
+    }
+    .tooltip:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+    .tooltip:hover {
+      animation: shake 0.3s;
+    }
+    @keyframes shake {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(5deg); }
+      50% { transform: rotate(-5deg); }
+      75% { transform: rotate(3deg); }
+      100% { transform: rotate(0deg); }
+    }
+    input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid #ffaeb8;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+    input#interest {
+      background-color: #fffef5;
     }
     button {
-      margin: 1rem auto 0.5rem;
-      display: block;
-      padding: 0.6rem 1.2rem;
-      font-size: 1rem;
-      font-weight: 600;
-      background-color: #e1c6ac;
-      color: #4b2e2e;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    button:hover {
-      background-color: #d1b59b;
-    }
-    .results {
       margin-top: 1.5rem;
+      width: 100%;
       padding: 1rem;
-      background-color: #fff;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      background-color: #f5a623;
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 1.2rem;
+      cursor: pointer;
     }
-    .results h2 {
-      font-family: 'Playfair Display', serif;
-      color: #4b2e2e;
-      margin-bottom: 0.8rem;
+    .result {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background-color: #fff5f7;
+      border: 3px solid #ffaeb8;
+      border-radius: 1rem;
+      font-size: 1.3rem;
+      line-height: 2.2rem;
+      font-weight: bold;
+      text-align: center;
     }
-    ul {
-      padding-left: 1.2rem;
+    .result .highlight {
+      font-size: 1.6rem;
+      color: #f85b3f;
+      background-color: #fff2e6;
+      padding: 0.5rem 1rem;
+      border-radius: 0.75rem;
+      display: inline-block;
+      margin-bottom: 1rem;
     }
-    .footer-note {
+    .chart-container {
+      margin-top: 2rem;
+    }
+    canvas {
+      width: 100% !important;
+      height: auto !important;
+    }
+    .footer {
       margin-top: 2rem;
       font-size: 0.85rem;
       text-align: center;
-      color: #888;
+      color: #aaa;
     }
-    .hidden {
-      display: none;
+    .info-box {
+      margin-top: 2.5rem;
+      padding: 1.2rem;
+      background-color: #fffaf0;
+      border-left: 5px solid #f5a623;
+      border-radius: 0.5rem;
+      font-size: 0.95rem;
+      line-height: 1.3rem;
+      color: #555;
     }
-    canvas {
-      max-width: 100%;
-      margin: 1rem auto 0;
-      display: block;
+    @media screen and (max-width: 480px) {
+      h1 {
+        font-size: 1.6rem;
+      }
+      .result .highlight {
+        font-size: 1.4rem;
+      }
     }
   </style>
-</head>
-<body>
-  <h1>Spočítej si svůj rozpočet</h1>
-  <p>Zadej své měsíční příjmy a výdaje. Kalkulačka ti ukáže, kolik můžeš investovat, spořit a kolik ti zbývá pro radost.</p>
-
-  <form id="budget-form">
-    <fieldset>
-      <legend>📥 Příjmy</legend>
-      <label>Příjem (hlavní): <input type="number" id="mainIncome" value="0" required></label>
-      <label>Příjem (vedlejší): <input type="number" id="sideIncome" value="0"></label>
-    </fieldset>
-
-    <fieldset>
-      <legend>📤 Výdaje</legend>
-      <label>Bydlení: <input type="number" id="housing" value="0"></label>
-      <label>Jídlo: <input type="number" id="food" value="0"></label>
-      <label>Doprava: <input type="number" id="transport" value="0"></label>
-      <label>Telefon a internet: <input type="number" id="utilities" value="0"></label>
-      <label>Děti: <input type="number" id="children" value="0"></label>
-      <label>Mazlíčci: <input type="number" id="pets" value="0"></label>
-      <label>Zábava: <input type="number" id="entertainment" value="0"></label>
-      <label>Splátky / dluhy: <input type="number" id="debts" value="0"></label>
-      <label>Ostatní: <input type="number" id="other" value="0"></label>
-      <label>Spoření <span class="tooltip" data-tooltip="Bezpečné odkládání peněz – např. spořicí účet, hotovost">❓</span>
-        <input type="number" id="currentSaving" value="0"></label>
-      <label>Investice <span class="tooltip" data-tooltip="Zhodnocování peněz s výkyvy – např. ETF, akcie, kryptoměny">❓</span>
-        <input type="number" id="currentInvesting" value="0"></label>
-    </fieldset>
-
-    <label>Styl rozpočtování:
-      <select id="style">
-        <option value="growth">Růstový</option>
-        <option value="conservative">Konzervativní</option>
-        <option value="balanced">Vyvážený</option>
-      </select>
-    </label>
-
-    <button type="submit">Spočítat</button>
-  </form>
-
-  <div class="results" id="results"></div>
-  <canvas id="budgetChart"></canvas>
-
-  <p class="footer-note">Vygenerováno pomocí Kalkulačky od @nebudsvorc — © Nikola Morla | <a href="https://nikolamorla.cz" target="_blank">nikolamorla.cz</a></p>
-
-  <script>
-    const ctx = document.getElementById('budgetChart').getContext('2d');
-    let chart;
-
-    document.getElementById("budget-form").addEventListener("submit", function (e) {
-      e.preventDefault();
-
-      const income = Number(document.getElementById("mainIncome").value) + Number(document.getElementById("sideIncome").value);
-      const expenses = ["housing", "food", "transport", "utilities", "children", "pets", "entertainment", "debts", "other", "currentSaving", "currentInvesting"]
-        .map(id => Number(document.getElementById(id).value) || 0)
-        .reduce((a, b) => a + b, 0);
-
-      const balance = income - expenses;
-      const style = document.getElementById("style").value;
-
-      let invest = 0, save = 0, free = 0;
-      if (style === "growth") {
-        invest = balance * 0.5;
-        save = balance * 0.3;
-        free = balance * 0.2;
-      } else if (style === "conservative") {
-        invest = balance * 0.2;
-        save = balance * 0.6;
-        free = balance * 0.2;
-      } else {
-        invest = balance * 0.3;
-        save = balance * 0.3;
-        free = balance * 0.4;
-      }
-
-      let rating = "";
-      let message = "";
-      const currentSaving = Number(document.getElementById("currentSaving").value) || 0;
-      const currentInvesting = Number(document.getElementById("currentInvesting").value) || 0;
-
-      const saveDiff = save - currentSaving;
-      const investDiff = invest - currentInvesting;
-
-      const tolerance = 0.1; // 10 % tolerance
-
-      const savingClose = Math.abs(saveDiff) <= save * tolerance;
-      const investingClose = Math.abs(investDiff) <= invest * tolerance;
-
-      if (currentSaving >= save && currentInvesting >= invest) {
-        rating = "✅ Strategie vyladěná";
-        message = "Wow! Tvůj finanční režim je fakt drsný. Tady je vidět tah na branku.";
-      } else if (savingClose && investingClose) {
-        rating = "✅ Strategie v rovnováze";
-        message = "Tvé rozdělení je velmi vyvážené – pokračuj tak dál.";
-      } else if ((currentSaving > 0 || currentInvesting > 0) && (currentSaving < save || currentInvesting < invest)) {
-        rating = "⚠️ Máš ještě rezervy";
-        message = "Daří se ti něco odkládat – a s pár úpravami můžeš mít ještě větší jistotu.";
-      } else {
-        rating = "❌ Pozor, ztrácíš příležitosti";
-        message = "Tvůj rozpočet má potenciál. Možná je čas posílit budoucí verzi sebe sama.";
-      }
-      if (balance > 0) {
-        message = "Tvůj rozpočet dává prostor růst. Zvaž investici do své budoucnosti.";
-      } else if (balance === 0) {
-        message = "Rozpočet vypadá vyrovnaně, jen drobné úpravy mohou přinést víc stability.";
-      } else {
-        message = "Výdaje převyšují příjmy. Zkus se zaměřit na položky, kde se dá něco ušetřit.";
-      }
-
-      let resultHtml = `
-        <h2>Výsledky</h2>
-        <p><strong>Zůstatek po výdajích:</strong> ${balance.toFixed(2)} Kč</p>
-        <p><strong>Doporučené rozdělení zůstatku:</strong></p>
-        <ul>
-          <li>Investice: ${invest.toFixed(2)} Kč</li>
-          <li>Spoření (rezerva): ${save.toFixed(2)} Kč</li>
-          <li>Volné výdaje: ${free.toFixed(2)} Kč</li>
-        </ul>
-        <p><em>${message}</em></p>
-      `;
-
-      resultHtml += `<p><strong>${rating}</strong></p><p><em>${message}</em></p>`;
-      document.getElementById("results").innerHTML = resultHtml;
-
-      // vykreslení koláčového grafu
-      if (chart) chart.destroy();
-      chart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-          labels: ['Investice', 'Spoření', 'Volné výdaje'],
-          datasets: [{
-            data: [invest, save, free],
-            backgroundColor: ['#a174d8', '#ffd28f', '#f5a89f'],
-            borderWidth: 1
-          }]
-        },
-        options: {
-          plugins: {
-            legend: {
-              position: 'bottom'
-            }
-          }
-        }
-      });
-    });
-  </script>
-</body>
-</html>
