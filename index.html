@@ -254,13 +254,17 @@
 
       let resultHtml = `
         <h2>Výsledky</h2>
-        <p><strong>Zůstatek po výdajích:</strong> ${balance.toFixed(2)} Kč</p>
+        <p><strong>Zůstatek po výdajích:</strong> ${balance.toFixed(2)} Kč</p>`;
+
+      if (balance > 0) {
+        resultHtml += `
         <p><strong>Doporučené rozdělení zůstatku:</strong></p>
         <ul>
           <li>Investice: ${invest.toFixed(2)} Kč</li>
           <li>Spoření (rezerva): ${save.toFixed(2)} Kč</li>
           <li>Volné výdaje: ${free.toFixed(2)} Kč</li>
-        </ul>
+        </ul>`;
+      }
               `;
 
       resultHtml += `<p><strong>${rating}</strong></p><p>${message}</p>`;
