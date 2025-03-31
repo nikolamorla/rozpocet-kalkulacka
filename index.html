@@ -9,9 +9,9 @@
   <style>
     body {
       font-family: 'Inter', sans-serif;
-      max-width: 700px;
+      max-width: 520px;
       margin: 1rem auto;
-      padding: 1rem;
+      padding: 0.5rem;
       line-height: 1.4;
       background-color: #f9f5f1;
       color: #333;
@@ -40,7 +40,7 @@
     }
     label {
       display: block;
-      margin-top: 0.5rem;
+      margin-top: 0.3rem;
       font-weight: 500;
     }
     input[type="number"], select {
@@ -74,7 +74,7 @@
       z-index: 10;
     }
     button {
-      margin: 1.5rem auto 1rem;
+      margin: 1rem auto 0.5rem;
       display: block;
       padding: 0.6rem 1.2rem;
       font-size: 1rem;
@@ -126,13 +126,13 @@
 
   <form id="budget-form">
     <fieldset>
-      <legend>Příjmy</legend>
+      <legend>📥 Příjmy</legend>
       <label>Příjem (hlavní): <input type="number" id="mainIncome" value="0" required></label>
       <label>Příjem (vedlejší): <input type="number" id="sideIncome" value="0"></label>
     </fieldset>
 
     <fieldset>
-      <legend>Výdaje</legend>
+      <legend>📤 Výdaje</legend>
       <label>Bydlení: <input type="number" id="housing" value="0"></label>
       <label>Jídlo: <input type="number" id="food" value="0"></label>
       <label>Doprava: <input type="number" id="transport" value="0"></label>
@@ -194,7 +194,32 @@
         free = balance * 0.4;
       }
 
+      let rating = "";
       let message = "";
+      const currentSaving = Number(document.getElementById("currentSaving").value) || 0;
+      const currentInvesting = Number(document.getElementById("currentInvesting").value) || 0;
+
+      const saveDiff = save - currentSaving;
+      const investDiff = invest - currentInvesting;
+
+      const tolerance = 0.1; // 10 % tolerance
+
+      const savingClose = Math.abs(saveDiff) <= save * tolerance;
+      const investingClose = Math.abs(investDiff) <= invest * tolerance;
+
+      if (currentSaving >= save && currentInvesting >= invest) {
+        rating = "✅ Strategie vyladěná";
+        message = "Wow! Tvůj finanční režim je fakt drsný. Tady je vidět tah na branku.";
+      } else if (savingClose && investingClose) {
+        rating = "✅ Strategie v rovnováze";
+        message = "Tvé rozdělení je velmi vyvážené – pokračuj tak dál.";
+      } else if ((currentSaving > 0 || currentInvesting > 0) && (currentSaving < save || currentInvesting < invest)) {
+        rating = "⚠️ Máš ještě rezervy";
+        message = "Daří se ti něco odkládat – a s pár úpravami můžeš mít ještě větší jistotu.";
+      } else {
+        rating = "❌ Pozor, ztrácíš příležitosti";
+        message = "Tvůj rozpočet má potenciál. Možná je čas posílit budoucí verzi sebe sama.";
+      }
       if (balance > 0) {
         message = "Tvůj rozpočet dává prostor růst. Zvaž investici do své budoucnosti.";
       } else if (balance === 0) {
@@ -215,6 +240,7 @@
         <p><em>${message}</em></p>
       `;
 
+      resultHtml += `<p><strong>${rating}</strong></p><p><em>${message}</em></p>`;
       document.getElementById("results").innerHTML = resultHtml;
 
       // vykreslení koláčového grafu
