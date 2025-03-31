@@ -206,6 +206,24 @@
       }
 
       let rating = "";
+      // let message = ""; (odstraněno kvůli duplicitě)
+
+      if (balance < 0) {
+        document.getElementById("results").innerHTML = `
+          <h2>Výsledky</h2>
+          <p><strong>Zůstatek po výdajích:</strong> ${balance.toFixed(2)} Kč</p>
+          <p><strong>Doporučené rozdělení zůstatku:</strong></p>
+          <ul>
+            <li>Investice: ${invest.toFixed(2)} Kč</li>
+            <li>Spoření (rezerva): ${save.toFixed(2)} Kč</li>
+            <li>Volné výdaje: ${free.toFixed(2)} Kč</li>
+          </ul>
+          <p><strong>❗️ Výdaje převyšují příjmy</strong></p>
+          <p>Tvoje výdaje převyšují příjmy – a to se dlouhodobě nedá udržet. Buď je potřeba některé výdaje zkrotit, nebo navýšit příjem. Jinak se tvůj rozpočet žene do potíží.</p>
+        `;
+        if (chart) chart.destroy();
+        return;
+      }
       let message = "";
       const currentSaving = Number(document.getElementById("currentSaving").value) || 0;
       const currentInvesting = Number(document.getElementById("currentInvesting").value) || 0;
