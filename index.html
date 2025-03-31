@@ -169,6 +169,7 @@
     let chart;
 
     document.getElementById("budget-form").addEventListener("submit", function (e) {
+      document.getElementById("results").innerHTML = "";
       e.preventDefault();
 
       const income = Number(document.getElementById("mainIncome").value) + Number(document.getElementById("sideIncome").value);
