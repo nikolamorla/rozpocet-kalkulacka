@@ -194,7 +194,7 @@
         if (chart) chart.destroy();
         return;
       }
-      const expenses = ["housing", "clothing", "education", "clothing", "hobbies", "gifts", "food", "transport", "utilities", "children", "pets", "entertainment", "debts", "other", "currentSaving", "currentInvesting"]
+      const expenses = ["housing", "clothing", "education", "hobbies", "gifts", "food", "transport", "utilities", "children", "pets", "entertainment", "debts", "other", "currentSaving", "currentInvesting"]
         .map(id => Number(document.getElementById(id).value) || 0)
         .reduce((a, b) => a + b, 0);
 
