@@ -5,7 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Rozpočtová kalkulačka</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js">document.getElementById("toggleSaving").addEventListener("change", function () {
+    document.getElementById("savingSection").classList.toggle("hidden", !this.checked);
+  });
+
+  document.getElementById("toggleInvesting").addEventListener("change", function () {
+    document.getElementById("investingSection").classList.toggle("hidden", !this.checked);
+  });
+document.getElementById("toggleExtra").addEventListener("change", function () {
+    document.getElementById("extraSection").classList.toggle("hidden", !this.checked);
+  });
+</script>
   <style>
     body {
       font-family: 'Inter', sans-serif;
@@ -147,10 +157,13 @@
       <label>Sport, zájmy, koníčky: <input type="number" id="hobbies"></label>
       <label>Dárky: <input type="number" id="gifts"></label>
       <label>Ostatní: <input type="number" id="other"></label>
-      <label>Spoření <span class="tooltip" data-tooltip="Bezpečné odkládání peněz – např. spořicí účet, hotovost">❓</span>
+      <label><input type="checkbox" id="toggleExtra"> Spoříš nebo investuješ?</label>
+      <div id="extraSection" class="hidden">
+        <label>Spoření <span class="tooltip" data-tooltip="Bezpečné odkládání peněz – např. spořicí účet, hotovost">❓</span>
         <input type="number" id="currentSaving"></label>
-      <label>Investice <span class="tooltip" data-tooltip="Zhodnocování peněz s výkyvy – např. ETF, akcie, kryptoměny">❓</span>
+        <label>Investice <span class="tooltip" data-tooltip="Zhodnocování peněz s výkyvy – např. ETF, akcie, kryptoměny">❓</span>
         <input type="number" id="currentInvesting"></label>
+      </div>
     </fieldset>
 
     <label>Styl rozpočtování:
