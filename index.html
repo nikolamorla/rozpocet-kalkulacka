@@ -125,8 +125,7 @@
 <body>
   <h1>Spočítej si svůj rozpočet</h1>
   <p>Zadej své měsíční příjmy a výdaje. Kalkulačka ti ukáže, kolik můžeš investovat, spořit a kolik ti zbývá pro radost.</p>
-
-  <form id="budget-form">
+<form id="budget-form">
     <fieldset>
       <legend>📥 Příjmy</legend>
       <label>Příjem (hlavní): <input type="number" id="mainIncome" value="0" required></label>
@@ -217,7 +216,7 @@
           
           <p><strong>❗️ Výdaje převyšují příjmy</strong></p>
           <p>Tvoje výdaje převyšují příjmy – a to se dlouhodobě nedá udržet. Buď je potřeba některé výdaje zkrotit, nebo navýšit příjem. Jinak se tvůj rozpočet žene do potíží.</p>
-    
+        `;
         if (chart) chart.destroy();
         document.getElementById("chart-label").style.display = "none";
         document.getElementById("budgetChart").style.display = "none";
@@ -226,72 +225,72 @@
         document.getElementById("chart-label").style.display = "block";
         document.getElementById("budgetChart").style.display = "block";
 
+        const currentSaving = Number(document.getElementById("currentSaving").value) || 0;
+        const currentInvesting = Number(document.getElementById("currentInvesting").value) || 0;
+
+        const saveDiff = save - currentSaving;
+        const investDiff = invest - currentInvesting;
+
+        const tolerance = 0.1; // 10 % tolerance
+
+        const savingClose = Math.abs(saveDiff) <= save * tolerance;
+        const investingClose = Math.abs(investDiff) <= invest * tolerance;
+
+        let rating = "";
+        let message = "";
+
+        if (currentSaving >= save && currentInvesting >= invest) {
+          rating = "✅ Strategie vyladěná";
+          message = "Wow! Tvůj finanční režim je fakt drsný. Tady je vidět tah na branku.";
+        } else if (savingClose && investingClose) {
+          rating = "✅ Strategie v rovnováze";
+          message = "Tvé rozdělení je velmi vyvážené – pokračuj tak dál.";
+        } else if ((currentSaving > 0 || currentInvesting > 0) && (currentSaving < save || currentInvesting < invest)) {
+          rating = "⚠️ Máš ještě rezervy";
+          message = "Daří se ti něco odkládat – a s pár úpravami můžeš mít ještě větší jistotu.";
+        } else {
+          rating = "❌ Pozor, ztrácíš příležitosti";
+          message = "Tvůj rozpočet má potenciál. Možná je čas posílit budoucí verzi sebe sama.";
+        }
+
+        let resultHtml = `
+          <h2>Výsledky</h2>
+          <p><strong>Zůstatek po výdajích:</strong> ${balance.toFixed(2)} Kč</p>`;
+
+        resultHtml += `
+          <p><strong>Doporučené rozdělení zůstatku:</strong></p>
+          <ul>
+            <li>Investice: ${invest.toFixed(2)} Kč</li>
+            <li>Spoření (rezerva): ${save.toFixed(2)} Kč</li>
+            <li>Volné výdaje: ${free.toFixed(2)} Kč</li>
+          </ul>
+          <p><strong>${rating}</strong></p><p>${message}</p>`;
+
+        document.getElementById("results").innerHTML = resultHtml;
+
+        if (chart) chart.destroy();
+        chart = new Chart(ctx, {
+          type: 'pie',
+          data: {
+            labels: ['Investice', 'Spoření', 'Volné výdaje'],
+            datasets: [{
+              data: [invest, save, free],
+              backgroundColor: ['#a174d8', '#ffd28f', '#f5a89f'],
+              borderWidth: 1
+            }]
+          },
+          options: {
+            plugins: {
+              legend: {
+                position: 'bottom'
               }
-      let message = "";
-      const currentSaving = Number(document.getElementById("currentSaving").value) || 0;
-      const currentInvesting = Number(document.getElementById("currentInvesting").value) || 0;
-
-      const saveDiff = save - currentSaving;
-      const investDiff = invest - currentInvesting;
-
-      const tolerance = 0.1; // 10 % tolerance
-
-      const savingClose = Math.abs(saveDiff) <= save * tolerance;
-      const investingClose = Math.abs(investDiff) <= invest * tolerance;
-
-      if (currentSaving >= save && currentInvesting >= invest) {
-        rating = "✅ Strategie vyladěná";
-        message = "Wow! Tvůj finanční režim je fakt drsný. Tady je vidět tah na branku.";
-      } else if (savingClose && investingClose) {
-        rating = "✅ Strategie v rovnováze";
-        message = "Tvé rozdělení je velmi vyvážené – pokračuj tak dál.";
-      } else if ((currentSaving > 0 || currentInvesting > 0) && (currentSaving < save || currentInvesting < invest)) {
-        rating = "⚠️ Máš ještě rezervy";
-        message = "Daří se ti něco odkládat – a s pár úpravami můžeš mít ještě větší jistotu.";
-      } else {
-        rating = "❌ Pozor, ztrácíš příležitosti";
-        message = "Tvůj rozpočet má potenciál. Možná je čas posílit budoucí verzi sebe sama.";
+            }
+          }
+        });
       }
       
 
-      let resultHtml = `
-        <h2>Výsledky</h2>
-        <p><strong>Zůstatek po výdajích:</strong> ${balance.toFixed(2)} Kč</p>`;
-
-      if (balance > 0) {
-        resultHtml += `
-        <p><strong>Doporučené rozdělení zůstatku:</strong></p>
-        <ul>
-          <li>Investice: ${invest.toFixed(2)} Kč</li>
-          <li>Spoření (rezerva): ${save.toFixed(2)} Kč</li>
-          <li>Volné výdaje: ${free.toFixed(2)} Kč</li>
-        </ul>`;
-      }
-              `;
-
-      resultHtml += `<p><strong>${rating}</strong></p><p>${message}</p>`;
-      document.getElementById("results").innerHTML = resultHtml;
-
-      // vykreslení koláčového grafu
-      if (chart) chart.destroy();
-      chart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-          labels: ['Investice', 'Spoření', 'Volné výdaje'],
-          datasets: [{
-            data: [invest, save, free],
-            backgroundColor: ['#a174d8', '#ffd28f', '#f5a89f'],
-            borderWidth: 1
-          }]
-        },
-        options: {
-          plugins: {
-            legend: {
-              position: 'bottom'
-            }
-          }
-        }
-      });
+      
     });
   </script>
 </body>
