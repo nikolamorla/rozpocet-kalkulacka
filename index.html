@@ -134,21 +134,23 @@
 
     <fieldset>
       <legend>📤 Výdaje</legend>
+            <label>Bydlení: <input type="number" id="housing"></label>
+      <label>Jídlo: <input type="number" id="food"></label>
+      <label>Doprava: <input type="number" id="transport"></label>
+      <label>Telefon a internet: <input type="number" id="utilities"></label>
+      <label>Děti: <input type="number" id="children"></label>
+      <label>Mazlíčci: <input type="number" id="pets"></label>
+      <label>Zábava: <input type="number" id="entertainment"></label>
+      <label>Splátky / dluhy: <input type="number" id="debts"></label>
       <label>Oblečení: <input type="number" id="clothing"></label>
+      <label>Vzdělávání: <input type="number" id="education"></label> <input type="number" id="clothing"></label>
       <label>Sport, zájmy, koníčky: <input type="number" id="hobbies"></label>
-      <label>Bydlení: <input type="number" id="housing"></label>
-      <label>Jídlo: <input type="number" id="food" value="0"></label>
-      <label>Doprava: <input type="number" id="transport" value="0"></label>
-      <label>Telefon a internet: <input type="number" id="utilities" value="0"></label>
-      <label>Děti: <input type="number" id="children" value="0"></label>
-      <label>Mazlíčci: <input type="number" id="pets" value="0"></label>
-      <label>Zábava: <input type="number" id="entertainment" value="0"></label>
-      <label>Splátky / dluhy: <input type="number" id="debts" value="0"></label>
-      <label>Ostatní: <input type="number" id="other" value="0"></label>
+      <label>Dárky: <input type="number" id="gifts"></label>
+      <label>Ostatní: <input type="number" id="other"></label>
       <label>Spoření <span class="tooltip" data-tooltip="Bezpečné odkládání peněz – např. spořicí účet, hotovost">❓</span>
-        <input type="number" id="currentSaving" value="0"></label>
+        <input type="number" id="currentSaving"></label>
       <label>Investice <span class="tooltip" data-tooltip="Zhodnocování peněz s výkyvy – např. ETF, akcie, kryptoměny">❓</span>
-        <input type="number" id="currentInvesting" value="0"></label>
+        <input type="number" id="currentInvesting"></label>
     </fieldset>
 
     <label>Styl rozpočtování:
@@ -186,7 +188,7 @@
         if (chart) chart.destroy();
         return;
       }
-      const expenses = ["housing", "clothing", "hobbies", "food", "transport", "utilities", "children", "pets", "entertainment", "debts", "other", "currentSaving", "currentInvesting"]
+      const expenses = ["housing", "clothing", "education", "clothing", "hobbies", "gifts", "food", "transport", "utilities", "children", "pets", "entertainment", "debts", "other", "currentSaving", "currentInvesting"]
         .map(id => Number(document.getElementById(id).value) || 0)
         .reduce((a, b) => a + b, 0);
 
