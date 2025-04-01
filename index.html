@@ -129,11 +129,13 @@
     <fieldset>
       <legend>📥 Příjmy</legend>
       <label>Příjem (hlavní): <input type="number" id="mainIncome" required></label>
-      <label>Příjem (vedlejší): <input type="number" id="sideIncome" value="0"></label>
+      <label>Příjem (vedlejší): <input type="number" id="sideIncome" ></label>
     </fieldset>
 
     <fieldset>
       <legend>📤 Výdaje</legend>
+      <label>Oblečení: <input type="number" id="clothing"></label>
+      <label>Sport, zájmy, koníčky: <input type="number" id="hobbies"></label>
       <label>Bydlení: <input type="number" id="housing"></label>
       <label>Jídlo: <input type="number" id="food" value="0"></label>
       <label>Doprava: <input type="number" id="transport" value="0"></label>
@@ -184,7 +186,7 @@
         if (chart) chart.destroy();
         return;
       }
-      const expenses = ["housing", "food", "transport", "utilities", "children", "pets", "entertainment", "debts", "other", "currentSaving", "currentInvesting"]
+      const expenses = ["housing", "clothing", "hobbies", "food", "transport", "utilities", "children", "pets", "entertainment", "debts", "other", "currentSaving", "currentInvesting"]
         .map(id => Number(document.getElementById(id).value) || 0)
         .reduce((a, b) => a + b, 0);
 
@@ -206,7 +208,7 @@
         free = balance * 0.4;
       }
 
-      let rating = "";
+      
       
 
       if (balance < 0) {
